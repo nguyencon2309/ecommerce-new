@@ -18,7 +18,7 @@ export const errorHandler = (err:Error,req:Request,res:Response,next:NextFunctio
 };
 type AsyncFunction = (req: Request, res: Response, next: NextFunction) => Promise<any>;
 
-const asyncHandler = (fn: AsyncFunction) =>
+export const asyncHandler = (fn: AsyncFunction) =>
   (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(fn(req, res, next)).catch(next);
   };

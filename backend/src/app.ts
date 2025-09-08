@@ -4,6 +4,7 @@ import cors from "cors";
 
 import type { Request,Response,NextFunction } from "express";
 import  {notFound,errorHandler} from "./middlewares/error.middleware"
+import userRouter from "./routes/user.routes"
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(express.urlencoded({ extended: true })); // parse form
 app.get("/health", (req: Request, res: Response) => {
   res.json({ message:"get health",status: "ok" });
 });
+app.use("/api/user",userRouter);
 
 // catch error
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
