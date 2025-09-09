@@ -16,7 +16,7 @@ export const createAuth = asyncHandler(async(req:Request,res:Response) => {
     const auth = await Author.create({name});
     res.status(201).json({
         message:"add new author succes",
-        data:auth
+        auth
     })
 })
 
