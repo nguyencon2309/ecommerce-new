@@ -1,5 +1,7 @@
 {
   "watch": ["src"],
   "ext": "ts,tsx,json,pug",
-  "ignore": ["src/public/**"]
+  "ignore": ["src/public/**"],
+  "exec": "ts-node src/index.ts"
+
 }

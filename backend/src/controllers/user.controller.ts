@@ -35,10 +35,39 @@ export const getListUser = asyncHandler(async(req:Request,res:Response) => {
     })
 })
 
-// export const updateUser = asyncHandler(async(req:Request,res:Response) => {
-//     const {name,password} = req.body;
-//     const updateUser = await User.findOneAndUpdate({})
-// })
+export const updateUser = asyncHandler(async(req:Request,res:Response) => {
+    const {name,password} = req.body;
+    if(!password || !name){
+        res.status(400);
+        throw new Error("Field can not empty");
+    }
+    const updateUser = await User.findByIdAndUpdate(
+        req.user,
+        {name,password},
+        {new:true}
+    )
+    if(!updateUser){
+        res.status(400);
+        throw new Error("Not authorized");
+    }
+    res.status(201).json({
+        message:"update success",
+        updateUser
+    })
+
+})
+
+export const deleteUser = asyncHandler(async(req:Request,res:Response) =>{
+    const deleteUser = await User.findByIdAndDelete({_id:req.user});
+    if(!deleteUser){
+        res.status(400);
+        throw new Error("User not found")
+    }
+    res.status(201).json({
+        message:"update success",
+        deleteUser
+    })
+})
 
 
 export const login = asyncHandler(async(req:Request,res:Response) => {
