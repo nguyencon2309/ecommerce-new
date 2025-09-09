@@ -7,7 +7,7 @@ import  {notFound,errorHandler} from "./middlewares/error.middleware"
 import userRouter from "./routes/user.routes"
 import authRouter from "./routes/auth.routes";
 import generRouter from "./routes/gener.routes";
-
+import bookRouter from "./routes/book.routes";
 const app = express();
 
 
@@ -21,8 +21,9 @@ app.get("/health", (req: Request, res: Response) => {
 });
 app.use("/api/user",userRouter);
 
-app.use("/api/auth",authRouter);
+app.use("/api/author",authRouter);
 app.use("/api/gener",generRouter);
+app.use("/api/book",bookRouter);
 // catch error
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);

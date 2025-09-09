@@ -118,7 +118,7 @@ export const logout = asyncHandler( async (req:Request,res:Response) => {
 } )
 export const isAdmin = asyncHandler(async(req:Request,res:Response, next:NextFunction) => {
     const user = await User.findById(req.user);
-    console.log(req.user,user)
+    
     if(!user){
         res.status(400);
         throw new Error("Not authorized");

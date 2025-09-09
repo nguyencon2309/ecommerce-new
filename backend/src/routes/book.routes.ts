@@ -1,0 +1,10 @@
+import Book from "../models/Book";
+import { createBook,getListBook } from "../controllers/book.controller";
+import { Router } from "express";
+import { uploadSingle } from "../middlewares/uploadImage";
+import { protect } from "../middlewares/auth.middleware";
+import { isAdmin } from "../controllers/user.controller";
+const bookRouter = Router();
+bookRouter.post("/create",protect,isAdmin,uploadSingle,createBook);
+bookRouter.get("/getList",protect,isAdmin,getListBook);
+export default bookRouter;
