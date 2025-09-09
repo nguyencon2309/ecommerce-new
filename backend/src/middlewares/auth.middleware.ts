@@ -4,7 +4,8 @@ import { JWT_SECRET } from "../config/env";
 import { Request,Response,NextFunction } from "express";
 
 interface JWT_PAYLOAD{
-    _id:string;
+    _id:string,
+    role:string
 }
 export const protect = (req:Request,res:Response,next:NextFunction) =>{
     let token:string|undefined;

@@ -4,6 +4,12 @@ import Author from "../models/Author";
 import Book from "../models/Book";
 
 export const createAuth = asyncHandler(async(req:Request,res:Response) => {
+    //check authen
+    if(req.user.role === "user"){
+        res.status(404)
+        throw new Error("Not authencation");
+    }
+
     const {name } = req.body;
     if(!name){
         res.status(400);
@@ -22,6 +28,12 @@ export const createAuth = asyncHandler(async(req:Request,res:Response) => {
 })
 
 export const updateAuth = asyncHandler(async(req:Request,res:Response) => {
+    //check authen
+    if(req.user.role === "user"){
+        res.status(404)
+        throw new Error("Not authencation");
+    }
+
     const {name } = req.body;
     const id = req.params?.id;
     if(!name || !id){
@@ -47,6 +59,12 @@ export const updateAuth = asyncHandler(async(req:Request,res:Response) => {
     )
 })
 export const deleteAuth = asyncHandler(async(req:Request,res:Response) => {
+    //check authen
+    if(req.user.role === "user"){
+        res.status(404)
+        throw new Error("Not authencation");
+    }
+    
     const id = req.params?.id;
     if( !id){
         res.status(400);

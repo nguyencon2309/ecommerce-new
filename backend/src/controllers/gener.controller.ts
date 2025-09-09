@@ -7,6 +7,11 @@ import Book from "../models/Book";
 
 
 export const createGener = asyncHandler(async(req:Request,res:Response) => {
+        //check authen
+    if(req.user.role === "user"){
+        res.status(404)
+        throw new Error("Not authencation");
+    }
     const {catelogy } = req.body;
     if(!catelogy){
         res.status(400);
@@ -25,6 +30,11 @@ export const createGener = asyncHandler(async(req:Request,res:Response) => {
 })
 
 export const updateGener = asyncHandler(async(req:Request,res:Response) => {
+        //check authen
+    if(req.user.role === "user"){
+        res.status(404)
+        throw new Error("Not authencation");
+    }
     const {catelogy } = req.body;
     const id = req.params?.id;
     if(!catelogy || !id){
@@ -50,6 +60,11 @@ export const updateGener = asyncHandler(async(req:Request,res:Response) => {
     )
 })
 export const deleteGener = asyncHandler(async(req:Request,res:Response) => {
+        //check authen
+    if(req.user.role === "user"){
+        res.status(404)
+        throw new Error("Not authencation");
+    }
     const id = req.params?.id;
     if( !id){
         res.status(400);

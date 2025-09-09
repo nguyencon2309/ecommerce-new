@@ -28,6 +28,10 @@ export const registerUser = asyncHandler(async(req:Request,res:Response) => {
 })
 
 export const getListUser = asyncHandler(async(req:Request,res:Response) => {
+    if(req.user.role === "user"){
+        res.status(404)
+        throw new Error("Not authencation");
+    }
     const listUser = await User.find();
     res.status(201).json({
         stauts:"success",
@@ -42,7 +46,7 @@ export const updateUser = asyncHandler(async(req:Request,res:Response) => {
         throw new Error("Field can not empty");
     }
     const updateUser = await User.findByIdAndUpdate(
-        req.user,
+        req.user._id,
         {name,password},
         {new:true}
     )
@@ -58,7 +62,7 @@ export const updateUser = asyncHandler(async(req:Request,res:Response) => {
 })
 
 export const deleteUser = asyncHandler(async(req:Request,res:Response) =>{
-    const deleteUser = await User.findByIdAndDelete({_id:req.user});
+    const deleteUser = await User.findByIdAndDelete({_id:req.user._id});
     if(!deleteUser){
         res.status(400);
         throw new Error("User not found")
@@ -87,7 +91,7 @@ export const login = asyncHandler(async(req:Request,res:Response) => {
         throw new Error("Password is Wrong");
     }
     
-    const token = generateToken((user._id as Types.ObjectId).toString());
+    const token = generateToken((user._id as Types.ObjectId).toString(),user.role);
 
     res.cookie("token",token,{
         httpOnly:true,
@@ -105,7 +109,7 @@ export const login = asyncHandler(async(req:Request,res:Response) => {
 })
 
 export const logout = asyncHandler( async (req:Request,res:Response) => {
-    const user = await User.findById(req.user);
+    const user = await User.findById(req.user._id);
     if(!user){
         res.status(400);
         throw new Error("Not authorized");
@@ -116,17 +120,17 @@ export const logout = asyncHandler( async (req:Request,res:Response) => {
     })
 
 } )
-export const isAdmin = asyncHandler(async(req:Request,res:Response, next:NextFunction) => {
-    const user = await User.findById(req.user);
+// export const isAdmin = asyncHandler(async(req:Request,res:Response, next:NextFunction) => {
+//     const user = await User.findById(req.user._id);
     
-    if(!user){
-        res.status(400);
-        throw new Error("Not authorized");
-    }
-    if(user.role ==="user"){
-        res.status(400);
-        throw new Error("You are not Admin");
-    }
-    next();
-})
+//     if(!user){
+//         res.status(400);
+//         throw new Error("Not authorized");
+//     }
+//     if(user.role ==="user"){
+//         res.status(400);
+//         throw new Error("You are not Admin");
+//     }
+//     next();
+// })
 

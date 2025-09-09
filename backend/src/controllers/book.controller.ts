@@ -4,6 +4,13 @@ import { asyncHandler } from "../middlewares/error.middleware"
 import { uploadImageToCloudinary ,cloudinaryDeleteImg} from "../utils/cloudinary";
 import User from "../models/User";
 export const createBook = asyncHandler(async(req:Request,res:Response) => {
+
+    //check authen
+    if(req.user.role === "user"){
+        res.status(404)
+        throw new Error("Not authencation");
+    }
+
     const {title,price,description,stock,authorId,generId} = req.body;
     const file = req.file as Express.Multer.File;
     if(!title || !price || !description || !stock || !authorId || !generId){
@@ -46,6 +53,13 @@ export const getListBook = asyncHandler(async(req:Request,res:Response) => {
     })
 })
 export const updateBook = asyncHandler(async(req:Request,res:Response) =>{
+
+        //check authen
+    if(req.user.role === "user"){
+        res.status(404)
+        throw new Error("Not authencation");
+    }
+
     const {title,price,description,stock,authorId,generId} = req.body;
     const _id = req.params?.id;
     if(!title || !price || !description || !stock || !authorId || !generId){
@@ -80,6 +94,11 @@ export const updateBook = asyncHandler(async(req:Request,res:Response) =>{
     
 })
 export const updateImageBook = asyncHandler(async(req:Request,res:Response) => {
+        //check authen
+    if(req.user.role === "user"){
+        res.status(404)
+        throw new Error("Not authencation");
+    }
     const _id = req.params?.id;
     if(!_id){
         res.status(400);
@@ -110,6 +129,11 @@ export const updateImageBook = asyncHandler(async(req:Request,res:Response) => {
 
 })
 export const deleteBook = asyncHandler(async(req:Request,res:Response) => {
+        //check authen
+    if(req.user.role === "user"){
+        res.status(404)
+        throw new Error("Not authencation");
+    }
     const _id = req.params?.id;
     
     const del = await Book.findById(_id);
