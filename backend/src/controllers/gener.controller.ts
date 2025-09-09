@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from "express";
 import { asyncHandler } from "../middlewares/error.middleware";
 
 import Gener from "../models/Gener"
+import Book from "../models/Book";
 
 
 export const createGener = asyncHandler(async(req:Request,res:Response) => {
@@ -53,6 +54,11 @@ export const deleteGener = asyncHandler(async(req:Request,res:Response) => {
     if( !id){
         res.status(400);
         throw new Error("Field can not empty");
+    }
+    const countBook = await Book.countDocuments({generId:id});
+    if(countBook > 0 ){
+        res.status(400);
+        throw new Error("Cannot delete gener because books are still linked")
     }
     const del = await Gener.findByIdAndDelete(id)
     if(!del){

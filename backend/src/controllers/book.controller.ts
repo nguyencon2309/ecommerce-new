@@ -1,12 +1,16 @@
 import { NextFunction, Request, Response } from "express";
 import Book from "../models/Book";
 import { asyncHandler } from "../middlewares/error.middleware"
-import { uploadImageToCloudinary } from "../utils/cloudinary";
+import { uploadImageToCloudinary ,cloudinaryDeleteImg} from "../utils/cloudinary";
+import User from "../models/User";
 export const createBook = asyncHandler(async(req:Request,res:Response) => {
-    const {title,price,desciption,stock,authorId,generId} = req.body;
+    const {title,price,description,stock,authorId,generId} = req.body;
     const file = req.file as Express.Multer.File;
-    
-    if(!file ){
+    if(!title || !price || !description || !stock || !authorId || !generId){
+        res.status(400);
+        throw new Error("field data empty");
+    }
+    if(!file   ){
         res.status(400);
         throw new Error("must have image");
     }
@@ -25,7 +29,7 @@ export const createBook = asyncHandler(async(req:Request,res:Response) => {
     }
     const uploadImage = await uploadImageToCloudinary(file);
     const image = uploadImage.secure_url
-    const book = await Book.create({title,price,desciption,stock,authorId,generId,image});
+    const book = await Book.create({title,price,description,stock,authorId,generId,image});
     await book.populate(['authorId','generId']);
     res.status(200).json({
         message:"create new book success",
@@ -40,4 +44,85 @@ export const getListBook = asyncHandler(async(req:Request,res:Response) => {
         message:"success",
         list
     })
+})
+export const updateBook = asyncHandler(async(req:Request,res:Response) =>{
+    const {title,price,description,stock,authorId,generId} = req.body;
+    const _id = req.params?.id;
+    if(!title || !price || !description || !stock || !authorId || !generId){
+        res.status(400);
+        throw new Error("field data empty");
+    }
+    if(!_id){
+        res.status(400);
+        throw new Error("not found id book")
+    }
+    const update = await Book.findByIdAndUpdate(_id,
+        {
+            title,
+            price,
+            stock,
+            description,
+            authorId,
+            generId
+        },
+        {
+            new:true
+        }
+    )
+    if(!update){
+        res.status(400);
+        throw new Error("not found book")
+    }
+    res.status(200).json({
+        message:"success",
+        update
+    })
+    
+})
+export const updateImageBook = asyncHandler(async(req:Request,res:Response) => {
+    const _id = req.params?.id;
+    if(!_id){
+        res.status(400);
+        throw new Error("not found id book")
+    }
+    const file = req.file as Express.Multer.File;
+    
+    if(!file  ){
+        res.status(400);
+        throw new Error("must have image");
+    }
+    const book = await Book.findById(_id);
+    if(!book){
+        res.status(400)
+        throw new Error("book not found")
+    } 
+    const updateImage = await uploadImageToCloudinary(file);
+    const image = updateImage.secure_url
+    await book.updateOne({
+        image:image
+    })
+    res.status(200).json(
+        {
+            message:"update image success",
+            book
+        }
+    )
+
+})
+export const deleteBook = asyncHandler(async(req:Request,res:Response) => {
+    const _id = req.params?.id;
+    
+    const del = await Book.findById(_id);
+    if(!del){
+        res.status(400)
+        throw new Error("book not found")
+    }
+    if(del.image) await cloudinaryDeleteImg(del.image);
+    await del?.deleteOne();
+    res.status(200).json(
+        {
+            message:"delete book success"
+        }
+    )
+
 })

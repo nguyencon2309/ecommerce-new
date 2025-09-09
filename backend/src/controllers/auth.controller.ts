@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler } from "../middlewares/error.middleware";
 import Author from "../models/Author";
+import Book from "../models/Book";
 
 export const createAuth = asyncHandler(async(req:Request,res:Response) => {
     const {name } = req.body;
@@ -50,6 +51,12 @@ export const deleteAuth = asyncHandler(async(req:Request,res:Response) => {
     if( !id){
         res.status(400);
         throw new Error("Field can not empty");
+    }
+    //delete ref to book 
+    const bookCount = await Book.countDocuments({authorId:id});
+    if(bookCount > 0){
+        res.status(400);
+        throw new Error("FCannot delete author because books are still linked");
     }
     const del = await Author.findByIdAndDelete(id)
     if(!del){
