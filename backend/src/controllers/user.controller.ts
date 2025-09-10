@@ -32,7 +32,7 @@ export const getListUser = asyncHandler(async(req:Request,res:Response) => {
         res.status(404)
         throw new Error("Not authencation");
     }
-    const listUser = await User.find();
+    const listUser = await User.find().sort({createdAt:-1});//mới nhất trước
     res.status(201).json({
         stauts:"success",
         data:listUser
@@ -40,14 +40,10 @@ export const getListUser = asyncHandler(async(req:Request,res:Response) => {
 })
 
 export const updateUser = asyncHandler(async(req:Request,res:Response) => {
-    const {name,password} = req.body;
-    if(!password || !name){
-        res.status(400);
-        throw new Error("Field can not empty");
-    }
+    const {email,...updateData} = req.body
     const updateUser = await User.findByIdAndUpdate(
         req.user._id,
-        {name,password},
+        updateData,
         {new:true}
     ).select('-password')
     if(!updateUser){

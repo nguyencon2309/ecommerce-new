@@ -12,9 +12,9 @@ export const createBook = asyncHandler(async(req:Request,res:Response) => {
         throw new Error("Not authencation");
     }
 
-    const {title,price,description,stock,authorId,generId} = req.body;
+    const {title,price,description,stock,authorId,generId,sold} = req.body;
     const file = req.file as Express.Multer.File;
-    if(!title || !price || !description || !stock || !authorId || !generId){
+    if(!title || !price || !description || !stock || !authorId || !generId ||!sold){
         res.status(400);
         throw new Error("field data empty");
     }
@@ -37,7 +37,7 @@ export const createBook = asyncHandler(async(req:Request,res:Response) => {
     }
     const uploadImage = await uploadImageToCloudinary(file);
     const image = uploadImage.secure_url
-    const book = await Book.create({title,price,description,stock,authorId,generId,image});
+    const book = await Book.create({title,price,description,stock,authorId,generId,image,sold});
     await book.populate(['authorId','generId']);
     res.status(200).json({
         message:"create new book success",
@@ -94,26 +94,17 @@ export const updateBook = asyncHandler(async(req:Request,res:Response) =>{
         res.status(404)
         throw new Error("Not authencation");
     }
+    
 
-    const {title,price,description,stock,authorId,generId} = req.body;
+    const {image,...updateData} = req.body;
     const _id = req.params?.id;
-    if(!title || !price || !description || !stock || !authorId || !generId){
-        res.status(400);
-        throw new Error("field data empty");
-    }
+    
     if(!_id){
         res.status(400);
         throw new Error("not found id book")
     }
     const update = await Book.findByIdAndUpdate(_id,
-        {
-            title,
-            price,
-            stock,
-            description,
-            authorId,
-            generId
-        },
+        updateData,
         {
             new:true
         }
@@ -150,11 +141,14 @@ export const updateImageBook = asyncHandler(async(req:Request,res:Response) => {
         res.status(400)
         throw new Error("book not found")
     } 
-    const updateImage = await uploadImageToCloudinary(file);
-    const image = updateImage.secure_url
-    await book.updateOne({
-        image:image
-    })
+    const [deleteImage,updateImage] = await Promise.all([
+        book.image ? cloudinaryDeleteImg(book.image):null,
+        uploadImageToCloudinary(file)
+    ])
+    
+    
+    book.image =  updateImage.secure_url;
+    await book.save();
     res.status(200).json(
         {
             message:"update image success",

@@ -7,10 +7,68 @@ import { ENV_NODE } from "../config/env";
 import Book from "../models/Book";
 import User from "../models/User";
 import { timeStamp } from "console";
+// export const createOrder = asyncHandler(async(req:Request,res:Response) => {
+//     const session = await mongoose.startSession();
+//     session.startTransaction();
+//     try{
+//         const {items,shippingAddress,paymentMethod} = req.body
+//         const userId = req.user._id;
+//         if (!items || items.length === 0) {
+//             res.status(400);
+//             throw new Error("No items in order");
+//         }
+//         let totalPrice = 0;
+//         const orderItems = []
+//         for(const item of items){
+//             const book = await Book.findById(item.book).session(session);
+//             if(!book){
+//                 res.status(400);
+//                 throw new Error("Book not found");
+//             }
+//             if(book.stock < item.quantity){
+//                 res.status(400);
+//                 throw new Error(`Book stock not enough for ${item.quantity}`);
+//             }
+//             book.stock -=item.quantity;
+//             book.sold +=item.quantity;
+//             await book.save({session});
+//             orderItems.push({
+//                 book:book._id,
+//                 price:book.price,
+//                 quantity:item.quantity
+//             })
+//             totalPrice += item.quantity * book.price;
+//         }
+//         const order = await Order.create(
+//           [
+//             {
+//               user: userId,
+//               items: orderItems,
+//               totalPrice,
+//               shippingAddress,
+//               paymentMethod,
+//             },
+//           ],
+//           { session }
+//         );
+
+//         await session.commitTransaction();
+//         session.endSession();
+
+//         res.status(201).json({ status: "success", order: order[0] });
+//     }
+//     catch(error){
+//         await session.abortTransaction();
+//         session.endSession();
+//         res.status(400);
+//         throw error;
+//     }
+    
+    
+
+// })
 export const createOrder = asyncHandler(async(req:Request,res:Response) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-    try{
+    
         const {items,shippingAddress,paymentMethod} = req.body
         const userId = req.user._id;
         if (!items || items.length === 0) {
@@ -20,49 +78,40 @@ export const createOrder = asyncHandler(async(req:Request,res:Response) => {
         let totalPrice = 0;
         const orderItems = []
         for(const item of items){
-            const book = await Book.findById(item.book).session(session);
+            const book = await Book.findById(item.book);
             if(!book){
                 res.status(400);
                 throw new Error("Book not found");
             }
-            if(book.stock < item.quanlity){
+            if(book.stock < item.quantity){
                 res.status(400);
-                throw new Error(`Book stock not enough for ${item.quanlity}`);
+                throw new Error(`Book stock not enough for ${item.quantity}`);
             }
-            book.stock -=item.quanlity;
-            book.sold +=item.quanlity;
-            await book.save({session});
+            book.stock -=item.quantity;
+            book.sold +=item.quantity;
+            await book.save();
             orderItems.push({
                 book:book._id,
                 price:book.price,
-                quanlity:item.quanlity
+                quantity:item.quantity
             })
             totalPrice += item.quantity * book.price;
         }
         const order = await Order.create(
-          [
+          
             {
               user: userId,
               items: orderItems,
               totalPrice,
               shippingAddress,
               paymentMethod,
-            },
-          ],
-          { session }
+            }
+          
         );
 
-        await session.commitTransaction();
-        session.endSession();
-
-        res.status(201).json({ status: "success", order: order[0] });
-    }
-    catch(error){
-        await session.abortTransaction();
-        session.endSession();
-        res.status(400);
-        throw error;
-    }
+        
+        res.status(201).json({ status: "success", order });
+   
     
     
 
@@ -118,7 +167,7 @@ export const getListOrderByUser = asyncHandler(async(req:Request,res:Response) =
             select:"name email"
         })
         .select('-abc')
-        .sort({createAt:-1});
+        .sort({createdAt:-1});
     res.status(200).json({
         message: "success",
         listOrder
@@ -141,13 +190,13 @@ export const getAllOrderAdmin = asyncHandler(async(req:Request,res:Response) => 
     const listOrder = await Order.find(query)
         .populate({
             path:"user",
-            select:"name gmail"
+            select:"name email"
         })
         .populate({
             path:"items.book",
             select:"title price"
         })
-        .sort({createAt:-1});
+        .sort({createdAt:-1});
     res.status(200).json({
         message: "success admin",
         listOrder

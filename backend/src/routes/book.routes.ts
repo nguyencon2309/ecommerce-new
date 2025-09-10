@@ -8,6 +8,6 @@ const bookRouter = Router();
 bookRouter.post("/create",protect,uploadSingle,createBook);
 bookRouter.get("/getList",protect,getListBook);
 bookRouter.delete("/delete/:id",protect,deleteBook);
-bookRouter.put("/updateBook/:id",protect,updateBook);
-bookRouter.put("/updateImageBook/:id",protect,uploadSingle,updateBook)
+bookRouter.patch("/updateBook/:id",protect,updateBook);
+bookRouter.post("/updateImageBook/:id",protect,uploadSingle,updateImageBook)
 export default bookRouter;

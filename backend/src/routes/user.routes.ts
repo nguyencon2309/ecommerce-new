@@ -7,6 +7,6 @@ userRouter.post("/login",login);
 userRouter.get("/logout",protect,logout);
 userRouter.get("/getList",protect,getListUser);
 userRouter.delete("/",protect,deleteUser);
-userRouter.post("/update",protect,updateUser);
+userRouter.patch("/update",protect,updateUser);
 
 export default userRouter;
