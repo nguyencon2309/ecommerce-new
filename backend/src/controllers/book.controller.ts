@@ -46,9 +46,12 @@ export const createBook = asyncHandler(async(req:Request,res:Response) => {
 
 })
 export const getListBook = asyncHandler(async(req:Request,res:Response) => {
-    const gener = req.params.gener;
-    const auth = req.params.auth;
+    const {gener,auth,search,sortBy,order} = req.query;
+    const limit = parseInt( req.query.limit as string) || 20;
+    const page = parseInt(req.query.page as string)||1;
+    
     const query :any = {};
+    const sortOptions : any ={};
     const [generDoc,authorDoc] = await Promise.all([
         gener ?Gener.findOne({catelogy:gener}) : null,
         auth ? Author.findOne({name:auth}) : null
@@ -63,9 +66,17 @@ export const getListBook = asyncHandler(async(req:Request,res:Response) => {
     }
     if(generDoc) query.generId = generDoc?._id;
     if(authorDoc) query.authorId = authorDoc._id;
+    if(search) query.title = { $regex: search, $options: 'i' }
+    if(sortBy){
+        if(order === "desc") sortOptions[sortBy as string] = -1;
+        else sortOptions[sortBy as string] = 1;
+    }
     const list = await Book.find(query)
         .populate('authorId')
-        .populate('generId');
+        .populate('generId')
+        .sort(sortOptions)
+        .skip((page-1)*limit)
+        .limit(limit);
     if(list.length ===0){
         res.status(400);
         throw new Error(`No books found matching the criteria.`)
