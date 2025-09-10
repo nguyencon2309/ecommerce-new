@@ -2,7 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import Book from "../models/Book";
 import { asyncHandler } from "../middlewares/error.middleware"
 import { uploadImageToCloudinary ,cloudinaryDeleteImg} from "../utils/cloudinary";
-import User from "../models/User";
+import Author from "../models/Author";
+import Gener from "../models/Gener";
 export const createBook = asyncHandler(async(req:Request,res:Response) => {
 
     //check authen
@@ -45,8 +46,31 @@ export const createBook = asyncHandler(async(req:Request,res:Response) => {
 
 })
 export const getListBook = asyncHandler(async(req:Request,res:Response) => {
-    const list = await Book.find().populate('authorId').populate('generId');
-    
+    const gener = req.params.gener;
+    const auth = req.params.auth;
+    const query :any = {};
+    const [generDoc,authorDoc] = await Promise.all([
+        gener ?Gener.findOne({catelogy:gener}) : null,
+        auth ? Author.findOne({name:auth}) : null
+    ])
+    if(gener && !generDoc){
+        res.status(400);
+        throw new Error(`Gener not found for ${gener}`);
+    }
+    if(auth && !authorDoc){
+        res.status(400);
+        throw new Error(`Author not found for ${auth}`);
+    }
+    if(generDoc) query.generId = generDoc?._id;
+    if(authorDoc) query.authorId = authorDoc._id;
+    const list = await Book.find(query)
+        .populate('authorId')
+        .populate('generId');
+    if(list.length ===0){
+        res.status(400);
+        throw new Error(`No books found matching the criteria.`)
+
+    }
     res.status(200).json({
         message:"success",
         list

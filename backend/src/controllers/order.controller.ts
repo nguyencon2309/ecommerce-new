@@ -30,6 +30,7 @@ export const createOrder = asyncHandler(async(req:Request,res:Response) => {
                 throw new Error(`Book stock not enough for ${item.quanlity}`);
             }
             book.stock -=item.quanlity;
+            book.sold +=item.quanlity;
             await book.save({session});
             orderItems.push({
                 book:book._id,
