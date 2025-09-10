@@ -49,7 +49,7 @@ export const updateUser = asyncHandler(async(req:Request,res:Response) => {
         req.user._id,
         {name,password},
         {new:true}
-    )
+    ).select('-password')
     if(!updateUser){
         res.status(400);
         throw new Error("Not authorized");

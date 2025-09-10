@@ -8,6 +8,7 @@ import userRouter from "./routes/user.routes"
 import authRouter from "./routes/auth.routes";
 import generRouter from "./routes/gener.routes";
 import bookRouter from "./routes/book.routes";
+import orderRouter from "./routes/order.routes";
 const app = express();
 
 
@@ -24,6 +25,7 @@ app.use("/api/user",userRouter);
 app.use("/api/author",authRouter);
 app.use("/api/gener",generRouter);
 app.use("/api/book",bookRouter);
+app.use("/api/order",orderRouter);
 // catch error
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
