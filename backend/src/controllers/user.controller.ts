@@ -99,7 +99,8 @@ export const login = asyncHandler(async(req:Request,res:Response) => {
     res.status(201).json({
         message:"login success",
         token:token,
-        role:user.role
+        role:user.role,
+        user:user.name
     })
 
 })
@@ -110,7 +111,11 @@ export const logout = asyncHandler( async (req:Request,res:Response) => {
         res.status(400);
         throw new Error("Not authorized");
     }
-    res.clearCookie("token");
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: ENV_NODE === "production",
+        sameSite: "strict"
+    });
     res.status(201).json({
         message:"logout success"
     })
