@@ -1,7 +1,7 @@
 import express from "express";
 import morgan from "morgan";
 import cors from "cors";
-
+import cookieParser from "cookie-parser";
 import type { Request,Response,NextFunction } from "express";
 import  {notFound,errorHandler} from "./middlewares/error.middleware"
 import userRouter from "./routes/user.routes"
@@ -24,7 +24,7 @@ app.use(cors({
 app.use(morgan("dev")); // log request
 app.use(express.json()); // parse JSON body
 app.use(express.urlencoded({ extended: true })); // parse form
-
+app.use(cookieParser());
 app.get("/health", (req: Request, res: Response) => {
   res.json({ message:"get health",status: "ok" });
 });
