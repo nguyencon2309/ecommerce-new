@@ -16,7 +16,7 @@ export const protect = (req:Request,res:Response,next:NextFunction) =>{
     
     if (!token && req.cookies?.token) {
         
-        token = req.cookies.token;
+        token = req.cookies?.token;
         
      }
     
