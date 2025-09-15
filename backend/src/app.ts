@@ -12,7 +12,15 @@ import orderRouter from "./routes/order.routes";
 const app = express();
 
 
-app.use(cors());
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://bookstore-frontend.vercel.app"
+];
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+}));
 app.use(morgan("dev")); // log request
 app.use(express.json()); // parse JSON body
 app.use(express.urlencoded({ extended: true })); // parse form
