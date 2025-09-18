@@ -14,11 +14,11 @@ export const protect = (req:Request,res:Response,next:NextFunction) =>{
         token = req.headers.authorization.split(' ')[1];
     }
     
-    if (!token && req.cookies?.token) {
+    // if (!token && req.cookies?.token) {
         
-        token = req.cookies?.token;
+    //     token = req.cookies?.token;
         
-     }
+    //  }
     
     if(!token){
         res.status(400);
