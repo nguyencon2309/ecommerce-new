@@ -7,7 +7,7 @@ const generRouter = Router()
 generRouter.post("/create",protect,createGener);
 generRouter.put("/update/:id",protect,updateGener);
 generRouter.delete("/delete/:id",protect,deleteGener);
-generRouter.get("/getAll",protect,getAllGener);
+generRouter.get("/getAll",getAllGener);
 
 
 export default generRouter
